@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="mx.onlinesellers.developermotoappbeta13.ViajeConfigActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/layoutA">
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/button"
+            android:background="@drawable/config_image_cloudupload"
+            android:onClick="selectAlertCloud" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fijar tiempo para guardar en nube mi ubicación cada:"
+        android:id="@+id/textView2"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/layoutA"
+        android:layout_toEndOf="@+id/layoutA"
+        android:textSize="16dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="0dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=" 15 minutos"
+        android:id="@+id/text_cloud"
+        android:layout_below="@+id/textView2"
+        android:layout_toRightOf="@+id/layoutA"
+        android:layout_toEndOf="@+id/layoutA"
+        android:textSize="23dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_dark"
+        android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:id="@+id/viewStub"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/common_plus_signin_btn_text_light_default"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/layoutA" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/viewStub"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout2">
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/button2"
+            android:background="@drawable/config_image_pauseauto"
+            android:onClick="selectAlertPauseA" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Activar pausa automatica por tiempo al no detectar distancia cada:"
+        android:id="@+id/textView7"
+        android:layout_alignTop="@+id/linearLayout2"
+        android:layout_toRightOf="@+id/linearLayout2"
+        android:layout_toEndOf="@+id/linearLayout2"
+        android:paddingLeft="10dp"
+        android:textSize="14dp"
+        android:paddingRight="0dp" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:id="@+id/viewStubd"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/common_plus_signin_btn_text_light_default"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/linearLayout2" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Desactivado"
+        android:id="@+id/text_pausea"
+        android:textSize="23dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_red_light"
+        android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:layout_below="@+id/textView7"
+        android:layout_toRightOf="@+id/linearLayout2"
+        android:layout_toEndOf="@+id/linearLayout2" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comenzar"
+        android:id="@+id/viajeco_btn_start"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>

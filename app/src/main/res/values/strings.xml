@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Developer Moto App Beta 1.3</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="reportar_accidente">REPORTAR ACCIDENTE</string>
+    <string name="crash_y_comentarios">CRASH Y COMENTARIOS</string>
+    <string name="motoapp_beta_1_3_2016_online_sellers">MotoApp beta 1.3 - 2016 Online Sellers.</string>
+    <string name="ver_recorridos">VER RECORRIDOS</string>
+    <string name="crear_recorridos">CREAR RECORRIDOS</string>
+    <string name="km_h">Km/h</string>
+    <string name="_00_00_00">00:00:00</string>
+    <string name="nombre">Nombre</string>
+    <string name="alias_o_apodo">Alias o Apodo</string>
+    <string name="nombreplaceholder">Nombre</string>
+    <string name="alias">Alias</string>
+    <string name="guardar">Guardar</string>
+    <string name="destino_automatico">Destino automatico</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="seleccionar">Seleccionar</string>
+</resources>
