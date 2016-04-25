@@ -1,5 +1,6 @@
 package mx.onlinesellers.developermotoappbeta13;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
@@ -133,7 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.map_btn_activity){
-            if(btn_activity.getTag() == 1){
+            if((int)btn_activity.getTag() == 1){
                 final int sdk = android.os.Build.VERSION.SDK_INT;
                 if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                     btn_activity.setBackgroundDrawable( getResources().getDrawable(R.drawable.map_icon_pause) );
@@ -281,7 +282,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //if user pressed "yes", then he is allowed to exit from application
-                finish();
+                //finish();
+                Intent intent = new Intent(MapsActivity.this, InicioActivity.class);
+                MapsActivity.this.navigateUpTo(intent);
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
