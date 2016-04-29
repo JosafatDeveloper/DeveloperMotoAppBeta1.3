@@ -1,6 +1,7 @@
 package mx.onlinesellers.developermotoappbeta13;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
@@ -65,6 +66,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public int pausea_select;
     public int public_type;
 
+    // Iniciality Parametros
+    public float velocidad_maxima = 0;
+    public int status_Track = 0;
+    public String name_Track;
+    public double count_promedio_Track;
+    public double plus_promedio_Track;
+    public double promedio_vel_Track;
+
     private ManagerUser dataSource;
 
     public int id_last_location;
@@ -92,6 +101,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pausea_select = extras.getInt("PAUSEA_SELECT");
             public_type = extras.getInt("PUBLIC_TYPE");
         }
+
+        // Load track BD
+        Cursor trackIDInfo = dataSource.getTrackInfo(track_id);
+        if (trackIDInfo != null) {
+            while(trackIDInfo.moveToNext()) {
+                velocidad_maxima = trackIDInfo.getFloat(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.MAX_VELOCITY));
+                status_Track = trackIDInfo.getInt(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.STATUS_ROUTE_TRACK));
+                name_Track = trackIDInfo.getString(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.STATUS_ROUTE_TRACK));
+                duracion = (double) trackIDInfo.getInt(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.TIME_TOTAL));
+                promedio_vel_Track = (double) trackIDInfo.getFloat(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.PROMEDIO_VELOCITY));
+                distancia = trackIDInfo.getInt(trackIDInfo.getColumnIndex(ManagerUser.ColumnRoutesTrack.DISTANCIA_TOTAL));
+                if(promedio_vel_Track == 0){
+                    count_promedio_Track = 0;
+                    plus_promedio_Track = 0;
+                }else{
+                    count_promedio_Track = 1;
+                    plus_promedio_Track = promedio_vel_Track;
+                }
+            }
+            trackIDInfo.close();
+        }else{
+            finish();
+        }
+
+
         // Configuracion
         btn_activity = (Button) findViewById(R.id.map_btn_activity);
         btn_activity.setOnClickListener(this);
@@ -146,6 +180,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 locationLast = null;
                 locationLast = new LatLng(MAGPSManager.latitud, MAGPSManager.longitud);
                 runTimer();
+                if(status_Track == 0){
+                    statusTrackSave(1);
+                }
             }else{
                 final int sdk = android.os.Build.VERSION.SDK_INT;
                 if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -166,6 +203,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(DialogInterface dialog, int which) {
                     //if user pressed "yes", then he is allowed to exit from application
                     //finish();
+                    statusTrackSave(2);
+                    pause_timer = true;
+                    stopTimer();
+                    Intent intent = new Intent(MapsActivity.this, PrevioMapActivity.class);
+                    intent.putExtra("ID_TRACK", track_id);
+                    MapsActivity.this.startActivity(intent);
+                    finish();
                 }
             });
             builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -182,16 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // render Activity
     public void setDisplayTimer(){
-        BigDecimal duracion_Big = new BigDecimal(duracion);
-        int[] time_array = MAFunciones.splitToComponentTimes(duracion_Big);
-        String hours = ""+time_array[0];
-        hours = ((hours.length() == 1) ? "0"+hours : hours);
-        String minutes = ""+time_array[1];
-        minutes = ((minutes.length() == 1) ? "0"+minutes : minutes);
-        String seconds = ""+time_array[2];
-        seconds = ((seconds.length() == 1) ? "0"+seconds : seconds);
-        String timer_string = ""+hours+":"+minutes+":"+seconds;
-        MapsActivity.this.text_timer.setText(timer_string);
+        MapsActivity.this.text_timer.setText(MAFunciones.stringTimer(duracion));
     }
 
     public void  setDisplayDistance(){
@@ -213,14 +248,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     runOnUiThread(new Runnable(){
                         public void run() {
                             setDisplayTimer();
+                            if(status_Track == 0){
+                                statusTrackSave(1);
+                            }
                             if(limit_saveline == secuencia_saveLine){
                                 secuencia_saveLine = 0;
                                 saveLineMaps();
                                 saveLineBD();
+                                timerAnddistanciaTrackSave(duracion, distancia, promedio_vel_Track);
                             }else{
                                 secuencia_saveLine += 1;
                             }
                             text_velocidad.setText(""+MAGPSManager.calcularVelocidad());
+                            velocidadTrackSave(MAGPSManager.addspeed);
+                            calulePromedioVelocidad(MAGPSManager.addspeed);
                             moveCamaraMaps();
                             if(limit_saveServer == secuencia_saveServer){
 
@@ -238,6 +279,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void stopTimer(){
         MapsActivity.this.timer_clock.cancel();
         MapsActivity.this.timer_clock = null;
+    }
+
+    public void statusTrackSave(int status){
+        dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.STATUS_ROUTE_TRACK, status, true);
+        if(status == 1){
+            dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.START_TRACK, dataSource.stringDateNow(), true);
+        }else if(status == 2){
+            dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.STOP_TRACK, dataSource.stringDateNow(), true);
+        }
+        status_Track = status;
+    }
+    public void velocidadTrackSave(float velmax){
+        if(velmax > velocidad_maxima){
+            velocidad_maxima = velmax;
+            dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.MAX_VELOCITY, velmax, true);
+        }
+    }
+
+    public void timerAnddistanciaTrackSave(double timerDuracion, int distanciaTotal, double promdeioVel){
+        dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.DISTANCIA_TOTAL, distanciaTotal, false);
+        dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.TIME_TOTAL, timerDuracion, false);
+        dataSource.saveElementTrack(track_id, ManagerUser.ColumnRoutesTrack.PROMEDIO_VELOCITY, promdeioVel, false);
+    }
+
+    public void calulePromedioVelocidad(float velocidad){
+        plus_promedio_Track += velocidad;
+        count_promedio_Track++;
+        promedio_vel_Track = plus_promedio_Track/count_promedio_Track;
     }
 
     public void saveLineMaps(){
@@ -281,10 +350,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //if user pressed "yes", then he is allowed to exit from application
-                //finish();
-                Intent intent = new Intent(MapsActivity.this, InicioActivity.class);
-                MapsActivity.this.navigateUpTo(intent);
+                pause_timer = true;
+                stopTimer();
+                finish();
+                Intent startInicio = new Intent(MapsActivity.this, InicioActivity.class);
+                startActivity(startInicio);
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -103,4 +103,8 @@ public class InicioActivity extends AppCompatActivity {
         startActivityForResult(intent, ADD_REQUEST_CODE);
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(false);
+    }
 }

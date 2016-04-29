@@ -2,6 +2,7 @@ package mx.onlinesellers.developermotoappbeta13;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -10,6 +11,7 @@ import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by dis2 on 18/04/16.
@@ -20,13 +22,14 @@ public class ManagerUser {
     public static final String ROUTES_TABLE_NAME = "routes";
     public static final String ROUTE_TRACK_TABLE_NAME = "routes_track";
     public static final String ROUTE_TRACK_CONFIG_TABLE_NAME = "routes_track_config";
-    public static final String ROUTE_TRACK_POINT_TABLE_NAME = "routes_track_point";
+    public static final String ROUTE_TRACK_POINT_TABLE_NAME = "routes_track_points";
     public static final String ROUTE_TRACK_POINT_MOVE_TABLE_NAME = "point_move";
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
     public static final String DATETIME_TYPE = "datetime";
     public static final String DOUBLE_TYPE = "double";
     public static final String DOUBLEC_TYPE = "double(20,10)";
+    public static final String FLOAT_TYPE = "float";
 
     //Campos de la tabla Quotes
     public static class ColumnUsers{
@@ -48,6 +51,7 @@ public class ManagerUser {
         public static final String MAX_VELOCITY = "velocidad_max";
         public static final String PROMEDIO_VELOCITY = "velocidad_promedio";
         public static final String TIME_TOTAL = "total_timer";
+        public static final String DISTANCIA_TOTAL = "distancia_total";
         public static final String START_TRACK = "start_track";
         public static final String STOP_TRACK = "stop_track";
         public static final String SAVE_TRACK = "save_track";
@@ -100,9 +104,10 @@ public class ManagerUser {
                     ColumnRoutesTrack.ID_ROUTE+" "+INT_TYPE+" not null,"+
                     ColumnRoutesTrack.ROUTE_TRACK_NAME+" "+STRING_TYPE+" not null,"+
                     ColumnRoutesTrack.STATUS_ROUTE_TRACK+" "+INT_TYPE+" not null,"+
-                    ColumnRoutesTrack.MAX_VELOCITY+" "+INT_TYPE+" not null,"+
-                    ColumnRoutesTrack.PROMEDIO_VELOCITY+" "+INT_TYPE+" not null,"+
+                    ColumnRoutesTrack.MAX_VELOCITY+" "+FLOAT_TYPE+" not null,"+
+                    ColumnRoutesTrack.PROMEDIO_VELOCITY+" "+FLOAT_TYPE+" not null,"+
                     ColumnRoutesTrack.TIME_TOTAL+" "+INT_TYPE+" not null,"+
+                    ColumnRoutesTrack.DISTANCIA_TOTAL+" "+INT_TYPE+" not null,"+
                     ColumnRoutesTrack.START_TRACK+" "+DATETIME_TYPE+" not null,"+
                     ColumnRoutesTrack.STOP_TRACK+" "+DATETIME_TYPE+" not null,"+
                     ColumnRoutesTrack.SAVE_TRACK+" "+DATETIME_TYPE+" not null,"+
@@ -114,10 +119,11 @@ public class ManagerUser {
                     ColumnRoutesTrackPoint.ID_TRACK+" "+INT_TYPE+" not null,"+
                     ColumnRoutesTrackPoint.GPS_LATITUD+" "+DOUBLEC_TYPE+" not null,"+
                     ColumnRoutesTrackPoint.GPS_LONGITUD+" "+DOUBLEC_TYPE+" not null,"+
-                    ColumnRoutesTrackPoint.GPS_VELOCIDAD+" "+DOUBLE_TYPE+" not null,"+
+                    ColumnRoutesTrackPoint.GPS_VELOCIDAD+" "+FLOAT_TYPE+" not null,"+
                     ColumnRoutesTrackPoint.GPS_ALTITUDE+" "+DOUBLEC_TYPE+" not null,"+
                     ColumnRoutesTrackPoint.TIMER_CHECK+" "+INT_TYPE+" not null,"+
                     ColumnRoutesTrackPoint.CHECK_DATETIME+" "+DATETIME_TYPE+" not null)";
+
     public static final String CREATE_ROUTE_TRACK_CONFIG_SCRIPT =
             "create table "+ROUTE_TRACK_CONFIG_TABLE_NAME+"("+
                     ColumnRoutesTrackConfig.ID_CONFIG+" "+INT_TYPE+" primary key autoincrement,"+
@@ -197,9 +203,17 @@ public class ManagerUser {
                         " order by datetime(\""+ColumnRoutesTrack.MODIFY_TRACK+"\") DESC", null);
     }
 
+    public Cursor getTrackInfo(int id_track){
+        return database.rawQuery(
+                "select "+
+                        " * from "+
+                        ROUTE_TRACK_TABLE_NAME+
+                        " where "+ColumnRoutesTrack.ID_ROUTE_TRACK+" = "+id_track, null);
+    }
+
     public Cursor getAllPointTrack(int id_track){
         return database.rawQuery(
-                "select "+ColumnRoutesTrackPoint.GPS_LATITUD+", "+ColumnRoutesTrackPoint.GPS_LONGITUD+" from "+ ROUTE_TRACK_POINT_TABLE_NAME + " where " +ColumnRoutesTrackPoint.ID_TRACK+ " = " + id_track, null);
+                "select "+ColumnRoutesTrackPoint.GPS_LATITUD+", "+ColumnRoutesTrackPoint.GPS_LONGITUD+", "+ColumnRoutesTrackPoint.GPS_VELOCIDAD+" from "+ ROUTE_TRACK_POINT_TABLE_NAME + " where " +ColumnRoutesTrackPoint.ID_TRACK+ " = " + id_track, null);
     }
 
     public int addNewRouteTrack(int route_id, String name_route){
@@ -212,6 +226,7 @@ public class ManagerUser {
         values.put(ColumnRoutesTrack.MAX_VELOCITY,0);
         values.put(ColumnRoutesTrack.PROMEDIO_VELOCITY,0);
         values.put(ColumnRoutesTrack.TIME_TOTAL,0);
+        values.put(ColumnRoutesTrack.DISTANCIA_TOTAL, 0);
         values.put(ColumnRoutesTrack.START_TRACK,"0000-00-00 00:00:00");
         values.put(ColumnRoutesTrack.STOP_TRACK,"0000-00-00 00:00:00");
         values.put(ColumnRoutesTrack.SAVE_TRACK,date);
@@ -247,5 +262,33 @@ public class ManagerUser {
         values.put(ColumnRoutesTrackPoint.CHECK_DATETIME,date);
         int id_point = (int) database.insert(ROUTE_TRACK_POINT_TABLE_NAME,null,values);
         return id_point;
+    }
+
+    // Save Track ALL
+    public void saveElementTrack(int idTrack, String row, Object value, boolean dateprint) {
+        ContentValues values = new ContentValues();
+        if (value.getClass() == Float.class) {
+            values.put(row, (float) value);
+        } else if (value.getClass() == Integer.class) {
+            values.put(row, (int) value);
+        } else if (value.getClass() == Double.class) {
+            values.put(row, (double) value);
+        } else if (value.getClass() == String.class) {
+            values.put(row, (String) value);
+        } else {
+            values.put(row, (String) value);
+        }
+        if (dateprint) {
+            values.put(ColumnRoutesTrack.MODIFY_TRACK, stringDateNow());
+        }
+        String selection = ColumnRoutesTrack.ID_ROUTE_TRACK + " = ?";
+        String[] selectionArgs = {idTrack + ""};
+        database.update(ROUTE_TRACK_TABLE_NAME, values, selection, selectionArgs);
+    }
+
+    public String stringDateNow(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = sdf.format(new Date());
+        return date;
     }
 }

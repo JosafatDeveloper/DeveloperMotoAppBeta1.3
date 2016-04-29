@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Developer Moto App Beta 1.3</string>
+    <string name="app_name">El Camino Beta v1.3</string>
     <string name="title_activity_maps">Map</string>
     <string name="reportar_accidente">REPORTAR ACCIDENTE</string>
     <string name="crash_y_comentarios">CRASH Y COMENTARIOS</string>
-    <string name="motoapp_beta_1_3_2016_online_sellers">MotoApp beta 1.3 - 2016 Online Sellers.</string>
+    <string name="motoapp_beta_1_3_2016_online_sellers">El Camino Beta v1.3 - 2016 Online Sellers. Todos los derechos reservados. El nombre y logotipo están en proceso de registro, ilegal hacer mal uso de marca o copia será penalizado por la ley.</string>
     <string name="ver_recorridos">VER RECORRIDOS</string>
     <string name="crear_recorridos">CREAR RECORRIDOS</string>
     <string name="km_h">Km/h</string>
@@ -16,4 +16,7 @@
     <string name="destino_automatico">Destino automatico</string>
     <string name="cancelar">Cancelar</string>
     <string name="seleccionar">Seleccionar</string>
+    <string name="vel_promedio">Vel. Promedio</string>
+    <string name="km_hs">Km/h</string>
 </resources>
+

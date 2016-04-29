@@ -80,6 +80,30 @@ public class MAFUNCIONES extends Service {
         }
     }
 
+    public String stringTimer(double duracion){
+        BigDecimal duracion_Big = new BigDecimal(duracion);
+        int[] time_array = splitToComponentTimes(duracion_Big);
+        String hours = ""+time_array[0];
+        hours = ((hours.length() == 1) ? "0"+hours : hours);
+        String minutes = ""+time_array[1];
+        minutes = ((minutes.length() == 1) ? "0"+minutes : minutes);
+        String seconds = ""+time_array[2];
+        seconds = ((seconds.length() == 1) ? "0"+seconds : seconds);
+        String timer_string = ""+hours+":"+minutes+":"+seconds;
+        return timer_string;
+    }
+
+    public int calcularVelocidad(float velocidad, boolean KHM){
+        if(KHM){
+            int speed=(int) ((velocidad*3600)/1000);
+            return speed;
+        }else{
+            int speed=(int) (velocidad*2.2369);
+            return speed;
+        }
+
+    }
+
     public static String formatDateTime(Context context, String timeToFormat) {
 
         String finalDateTime = "";

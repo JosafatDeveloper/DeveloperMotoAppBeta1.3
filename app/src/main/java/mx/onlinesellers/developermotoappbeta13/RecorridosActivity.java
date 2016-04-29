@@ -39,7 +39,8 @@ public class RecorridosActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(RecorridosActivity.this, PrevioMapActivity.class);
-        intent.putExtra("ID_TRACK", id);
+        intent.putExtra("ID_TRACK", (int) id);
+        intent.putExtra("goBack", true);
         RecorridosActivity.this.startActivity(intent);
 
     }

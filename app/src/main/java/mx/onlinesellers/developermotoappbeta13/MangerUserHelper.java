@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MangerUserHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Users.db";
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 11;
 
     public MangerUserHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,8 +38,8 @@ public class MangerUserHelper extends SQLiteOpenHelper {
                 en tu proxima versión
              */
         //db.execSQL("ALTER TABLE routes_track_points RENAME TO routes_track_point");
-        db.execSQL("DROP TABLE routes_track_points");
-        db.execSQL(ManagerUser.CREATE_ROUTE_TRACK_POINT_SCRIPT);
+        //db.execSQL("DROP TABLE routes_tracks");
+        //db.execSQL(ManagerUser.CREATE_ROUTE_TRACK_SCRIPT);
 
 
     }
